@@ -4,7 +4,7 @@ IServiceCollection serviceCollection = new ServiceCollection();
 
 serviceCollection.AddScoped<SomeEndPoint>();
 serviceCollection.AddTransient<ServiceA>();
-serviceCollection.AddScoped<ServiceB>();
+serviceCollection.AddTransient<ServiceB>();
 serviceCollection.AddSingleton<App>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
