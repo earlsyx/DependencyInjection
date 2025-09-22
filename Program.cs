@@ -2,8 +2,8 @@
 
 IServiceCollection serviceCollection = new ServiceCollection();
 
-serviceCollection.AddSingleton<SomeEndPoint>();
-serviceCollection.AddSingleton<ServiceA>();
+serviceCollection.AddScoped<SomeEndPoint>();
+serviceCollection.AddTransient<ServiceA>() ;
 serviceCollection.AddSingleton<App>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -13,8 +13,9 @@ for (int i = 1; i < 4; i++)
 {
     app.Run(i, serviceProvider);
 }
-public class App
+public class App(ServiceA serviceA)
 {
+    private readonly ServiceA _serviceA = serviceA;
     public void Run(int requestNumber, ServiceProvider serviceProvider)
     {
         Console.WriteLine($"Request {requestNumber}:");
@@ -22,6 +23,7 @@ public class App
         var endpoint = scope.ServiceProvider
             .GetRequiredService<SomeEndPoint>();
         endpoint.Handle();
+        _serviceA.DoWork();
     }
 }
 
