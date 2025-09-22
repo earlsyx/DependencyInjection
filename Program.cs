@@ -3,7 +3,8 @@
 IServiceCollection serviceCollection = new ServiceCollection();
 
 serviceCollection.AddScoped<SomeEndPoint>();
-serviceCollection.AddTransient<ServiceA>() ;
+serviceCollection.AddTransient<ServiceA>();
+serviceCollection.AddScoped<ServiceB>();
 serviceCollection.AddSingleton<App>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -13,9 +14,8 @@ for (int i = 1; i < 4; i++)
 {
     app.Run(i, serviceProvider);
 }
-public class App(ServiceA serviceA)
+public class App()
 {
-    private readonly ServiceA _serviceA = serviceA;
     public void Run(int requestNumber, ServiceProvider serviceProvider)
     {
         Console.WriteLine($"Request {requestNumber}:");
@@ -23,7 +23,11 @@ public class App(ServiceA serviceA)
         var endpoint = scope.ServiceProvider
             .GetRequiredService<SomeEndPoint>();
         endpoint.Handle();
-        _serviceA.DoWork();
+
+        var serviceB = scope.ServiceProvider
+            .GetRequiredService<ServiceB>();
+
+        serviceB.DoWork();
     }
 }
 
@@ -37,7 +41,15 @@ public class SomeEndPoint(ServiceA serviceA) : BaseClass
     }
 }
 
-public class ServiceA : BaseClass
+public class ServiceA(ServiceB serviceB) : BaseClass
+{
+    private readonly ServiceB _service = serviceB;
+    internal void DoWork()
+    {
+        Out($"{this} doing work.");
+        _service.DoWork();
+    }
+}public class ServiceB : BaseClass
 {
     internal void DoWork()
     {
